@@ -2,9 +2,11 @@ import Head from 'next/head';
 import type { AppProps } from 'next/app';
 import { ApolloProvider } from "@apollo/client";
 import client from "../apollo";
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
-import ThemeProviderWrapper from '../theme/ThemeProvider';
+
+import theme from "../theme";
 import AuthProvider from '../hocs/providers/AuthProvider';
 import createEmotionCache from '../config/emotionCache';
 import AppWrapper from "../hocs/layout";
@@ -22,16 +24,16 @@ function MyApp(props: CustojmAppProps) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <ThemeProviderWrapper>
-        <CssBaseline />
-        <AuthProvider>
-          <ApolloProvider client={client}>
+      <AuthProvider>
+        <ApolloProvider client={client}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
             <AppWrapper>
               <Component {...pageProps} />
             </AppWrapper>
-          </ApolloProvider>
-        </AuthProvider>
-      </ThemeProviderWrapper>
+          </ThemeProvider>
+        </ApolloProvider>
+      </AuthProvider>
     </CacheProvider>
   )
 }

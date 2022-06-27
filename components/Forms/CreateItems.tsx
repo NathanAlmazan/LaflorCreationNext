@@ -60,7 +60,7 @@ function CreateItems({ discounts, uploadImage, resetImage }: CreateItemsProps) {
               }
             }})
 
-            setStatus({ success: false });
+            setStatus({ success: true });
             setSubmitting(false);
             resetForm();
             resetImage();

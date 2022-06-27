@@ -24,7 +24,7 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 // firebase
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { firebaseAuth } from "../../config/firebase/client";
+import { firebaseAuth } from "../../../config/firebase/client";
 
 const FirebaseSocial = dynamic(() => import('./FirebaseSocial'), { ssr: false });
 

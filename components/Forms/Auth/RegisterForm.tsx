@@ -24,13 +24,13 @@ import dynamic from "next/dynamic";
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 // utils
-import { strengthColor, strengthIndicator } from '../../utls/passwordStrength';
+import { strengthColor, strengthIndicator } from '../../../utls/passwordStrength';
 //firebase
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { firebaseAuth } from "../../config/firebase/client";
+import { firebaseAuth } from "../../../config/firebase/client";
 // apollo
 import { useMutation } from "@apollo/client";
-import { CREATE_CLIENT, ClientVars, Client } from "../../apollo/clients";
+import { CREATE_CLIENT, ClientVars, Client } from "../../../apollo/clients";
 
 
 

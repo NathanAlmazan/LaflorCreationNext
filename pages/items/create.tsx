@@ -57,7 +57,7 @@ export default function CreateItemsPage({ discounts }: CreateItemProps) {
   return (
     <>
       <Head>
-        <title>Create Item</title>
+        <title>Create Item | La Flor Creation</title>
       </Head>
       <PageTitleWrapper>
           <PageHeader 

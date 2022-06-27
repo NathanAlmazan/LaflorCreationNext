@@ -1,5 +1,10 @@
 import { gql } from "@apollo/client";
 
+export interface Account {
+    uid: string;
+    email: string;
+}
+
 export interface Client {
     clientId: number;
     accountUid: string | null;

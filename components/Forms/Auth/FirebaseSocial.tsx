@@ -3,13 +3,13 @@ import Image from "next/image";
 import { useTheme } from '@mui/material/styles';
 import { useMediaQuery, Button, Stack } from '@mui/material';
 // assets
-import Google from '../../assets/google.svg';
-import Facebook from '../../assets/facebook.svg';
+import Google from '../../../assets/google.svg';
+import Facebook from '../../../assets/facebook.svg';
 import { ApolloCache, DefaultContext, MutationFunctionOptions } from "@apollo/client";
-import { Client, ClientVars } from "../../apollo/clients";
+import { Client, ClientVars } from "../../../apollo/clients";
 //firebase
 import { GoogleAuthProvider, signInWithPopup, FacebookAuthProvider } from "firebase/auth";
-import { firebaseAuth } from "../../config/firebase/client";
+import { firebaseAuth } from "../../../config/firebase/client";
 // ==============================|| FIREBASE - SOCIAL BUTTON ||============================== //
 
 type FirebaseSocialProps = {

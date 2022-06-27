@@ -13,7 +13,7 @@ type HeaderProps = {
 
 function PageHeader({ buttonText, title, subtitle, buttonClick }: HeaderProps) {
   return (
-    <Grid container justifyContent="space-between" alignItems="center">
+    <Grid container justifyContent="space-between" alignItems="center" spacing={2}>
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
           {title}

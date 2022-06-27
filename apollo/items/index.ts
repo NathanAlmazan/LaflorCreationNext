@@ -9,6 +9,10 @@ export interface DiscountProps {
     allDiscount: Discount[];
 }
 
+export interface ItemByCodeProps {
+  code: string;
+}
+
 export interface ItemsVars {
     itemCode: string;
     itemName: string;
@@ -27,7 +31,15 @@ export interface Items {
     discountCode: string | null
     discount: Discount | null
 }
-  
+
+export interface ItemsFindVars {
+  addons?: boolean;
+}
+
+export interface ItemsProps {
+  allItems: Items[];
+  itemByCode?: Items
+}  
 
 export const ALL_DISCOUNT = gql`
 query AllDiscount {
@@ -36,6 +48,22 @@ query AllDiscount {
       discAmount
     }
   }
+`
+
+export const ALL_ITEMS = gql`
+query AllItems($addons: Boolean) {
+  allItems(addons: $addons) {
+    itemCode
+    itemName
+    itemPrice
+    isAddon
+    itemImage
+    discountCode
+    discount {
+      discAmount
+    }
+  }
+}
 `
 
 export const CREATE_ITEM = gql`
@@ -47,4 +75,20 @@ mutation createItems($item: ItemsInput!) {
         isAddon
     }
   }
+`
+
+export const ITEM_BY_CODE = gql`
+query ItemByCode($code: String!) {
+  itemByCode(code: $code) {
+    itemCode
+    itemName
+    itemPrice
+    isAddon
+    itemImage
+    discountCode
+    discount {
+      discAmount
+    }
+  }
+}
 `

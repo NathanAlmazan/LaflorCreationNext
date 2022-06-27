@@ -1,11 +1,10 @@
 import React from 'react';
 import { Grid, Stack, Typography } from '@mui/material';
-import AuthWrapper from '../hocs/layout/AuthWrapper';
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useAuth } from '../hocs/providers/AuthProvider';
 
-const AuthLogin = dynamic(() => import('../components/AuthForms/LoginForm'));
+const AuthLogin = dynamic(() => import('../components/Forms/Auth/LoginForm'));
 
 export default function LoginPage() {
   const { user } = useAuth();
