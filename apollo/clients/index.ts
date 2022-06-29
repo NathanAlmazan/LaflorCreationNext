@@ -12,6 +12,17 @@ export interface Client {
     clientContact: string;
 }
 
+export interface Recipient {
+    recipientId: number;
+    recipientName: string;
+    recipientContact: string;
+    recipientStreet: string;
+    recipientCity: string;
+    recipientProvince: string;
+    latitude: number;
+    longitude: number;
+}
+
 export interface ClientVars {
     accountUid: string | null;
     clientName: string;

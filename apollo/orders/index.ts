@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
+import { Recipient } from "../clients";
 import { Discount, Items } from "../items";
 
 export type OrderStatus = "CRT" | "PND" | "PAID" | "DSP" | "DLV";
-
 
 export interface OrderInput {
     mop: string;
@@ -55,8 +55,13 @@ export interface Orders {
     fRemarks: string
     clientId: number;
     recipientId: number;
+    recipient: Recipient;
     riderId: number;
     orderDetails: OrderDetails[];
+}
+
+export interface GetOrderVars {
+    orderUid: string;
 }
 
 export const CREATE_ORDER = gql`
@@ -73,4 +78,24 @@ mutation CreateOrder($details: [OrderDetailInput]!) {
       orderUid
     }
 }
+`
+
+export const GET_ORDER_BY_UID = gql`
+query OrderById($orderUid: String!) {
+    orderById(orderUid: $orderUid) {
+      amount
+      recipient {
+        recipientName
+      }
+      orderDetails {
+        finalPrice
+        quantity
+        item {
+          itemName
+          itemImage
+          isAddon
+        }
+      }
+    }
+  }
 `

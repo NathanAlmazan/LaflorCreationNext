@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import { Items } from '../../../apollo/items';
 // next
 import { useRouter } from "next/router";
@@ -110,8 +111,15 @@ export default function ShopProductCard({ product, selected, placed, placeOrder,
           )}
           {!placed ? (
             <Stack direction="row" spacing={2}>
-              <Button variant="contained" size="large" onClick={placeOrder} fullWidth>Place Order</Button>
-              <Button variant="outlined" size="large" fullWidth>Add to Cart</Button>
+              <Button 
+                variant="contained" 
+                size="large" 
+                onClick={placeOrder} 
+                endIcon={<ArrowForwardOutlinedIcon />}
+                fullWidth
+              >
+                Add Recipient
+              </Button>
             </Stack>
           ) : (
             <Stack direction="row" spacing={2} display={{ sm: "none", md: "flex" }}>

@@ -49,6 +49,7 @@ export default function OrderItemPage({ items, account, product }: OrderPageProp
     const updated = { ...selected[index], quantity: quantity };
     setSelected([ ...selected.slice(0, index), updated, ...selected.slice(index + 1) ]);
   }
+  const handlePlaceOrder = () => setPlacedOrder(!placedOrder);
 
   return (
     <>
@@ -86,13 +87,12 @@ export default function OrderItemPage({ items, account, product }: OrderPageProp
                     selected={selected}
                     update={handleUpdateQuantity}
                     remove={handleRemoveSelected}
-                    placeOrder={() => setPlacedOrder(!placedOrder)}
+                    placeOrder={handlePlaceOrder}
                   />
                 </Grid>
-                {matches && (
-                  <Grid item md={12} sx={{ display: { xs: "none", sm: "none", md: "flex" }, flexDirection: "column", mb: 5 }}>
+                {placedOrder ? (
+                  <Grid item md={12} sx={{ flexDirection: "column", mb: 5 }}>
                     <AnimatePresence exitBeforeEnter>
-                      {placedOrder ? (
                         <motion.div
                           key="form"
                           initial={{ opacity: 0, y: 200 }}
@@ -100,9 +100,13 @@ export default function OrderItemPage({ items, account, product }: OrderPageProp
                           exit={{ opacity: 0, y: 200 }}
                         >
                           <Typography variant="h3" color="primary" sx={{ mb: 2 }}>Recipient Information</Typography>
-                          <OrderForm account={account.uid} details={selected} />
+                          <OrderForm account={account.uid} details={selected} item={{ ...product, quantity: 1 }} />
                         </motion.div>
-                      ) : (
+                    </AnimatePresence>
+                  </Grid>
+                ) : (
+                  <Grid item md={12} sx={{ display: { xs: "none", sm: "none", md: "flex" }, flexDirection: "column", mb: 5 }}>
+                    <AnimatePresence exitBeforeEnter>
                         <motion.div
                           key="items"
                           initial={{ opacity: 0, y: 200 }}
@@ -116,7 +120,6 @@ export default function OrderItemPage({ items, account, product }: OrderPageProp
                             selected={selected}
                           />
                         </motion.div>
-                      )}
                     </AnimatePresence>
                   </Grid>
                 )}
@@ -145,21 +148,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       
       const { uid, email } = token;
   
-      const { data: itemsList, error: listError } = await client.query<ItemsProps, ItemsFindVars>({
+      const { data: itemsList } = await client.query<ItemsProps, ItemsFindVars>({
         query: ALL_ITEMS,
         variables: {
           addons: true
         }
       });
 
-      const { data: item, error: itemError } = await client.query<ItemsProps, ItemByCodeProps>({
+      const { data: item } = await client.query<ItemsProps, ItemByCodeProps>({
         query: ITEM_BY_CODE,
         variables: {
           code: query.itemCode as string
         }
       });
     
-      if (listError || itemError || !item.itemByCode) return {
+      if (!item.itemByCode) return {
         notFound: true,
       }
     

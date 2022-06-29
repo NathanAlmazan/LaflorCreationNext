@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { Formik, FormikProps } from 'formik';
 // mui
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
@@ -26,9 +26,20 @@ type Location = {
 
 interface OrderDetails extends Items {
     quantity: number
-  }
+}
 
-export default function OrderForm({ account, details }: { account: string, details: OrderDetails[] }) {
+interface IFormValues {
+    firstname: string;
+    lastname: string;
+    contact: string;
+    message: string;
+    dNote: string;
+    fRemarks: string;
+    deliveryDate: Date,
+    submit: null;
+}
+
+export default function OrderForm({ account, details, item }: { account: string, details: OrderDetails[], item: OrderDetails }) {
     const router = useRouter();
     const [currentLocation, setCurrentLocation] = useState<Location>({
         lat: 14.657868,
@@ -48,28 +59,14 @@ export default function OrderForm({ account, details }: { account: string, detai
         { details: OrderDetailInput[] }
     >(CREATE_ORDER_DETAIL);
 
-  return (
-    <Formik
-        initialValues={{
-            firstname: '',
-            lastname: '',
-            contact: '',
-            message: '',
-            dNote: '',
-            fRemarks: '',
-            deliveryDate: new Date(),
-            submit: null
-        }}
-        validationSchema={Yup.object().shape({
-            firstname: Yup.string().max(50).required("Recipient firstname is required."),
-            lastname: Yup.string().max(50).required("Recipient lastname is required."),
-            contact: Yup.string().min(10).max(12).required("Recipient contact number is required."),
-            message: Yup.string().max(250).required("Dedication message is required."),
-            dNote: Yup.string().max(250),
-            fRemarks: Yup.string().max(250),
-            deliveryDate: Yup.date().required("Delivery date is required.")
-        })}
-        onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+    const handleSubmitButtonClick = async (
+        type: boolean,
+        formikProps: FormikProps<IFormValues>
+    ) => {
+        const { values, submitForm, setSubmitting, setStatus, setErrors } = formikProps;
+
+        submitForm();
+
         try {
             if (address.length !== 0) {
                 createOrder({ variables: {
@@ -93,8 +90,10 @@ export default function OrderForm({ account, details }: { account: string, detai
                         latitude: lat,
                         longitude: lng
                     }
-                }}).then(result => {
+                }}).then(async (result) => {
                     const data = result.data;
+                    details.push(item);
+
                     if (details.length > 0 && data) {
                         const orderDetails: OrderDetailInput[] = details.map(d => ({
                             discountCode: d.discountCode,
@@ -103,14 +102,16 @@ export default function OrderForm({ account, details }: { account: string, detai
                             quantity: d.quantity
                         }));
 
-                        createOrderDetail({ variables: {
+                        await createOrderDetail({ variables: {
                             details: orderDetails
                         }});
-                    }
+
+                        setStatus({ success: true });
+                        setSubmitting(false);
     
-                    setStatus({ success: true });
-                    setSubmitting(false);
-                    router.push('/items');
+                        if (type) router.push("/items");
+                        else router.push("/order/payment/" + data.createOrder.orderUid);
+                    }
                 })
             } else {
                 setErrors({ submit: "Recipient address is required." });
@@ -122,11 +123,36 @@ export default function OrderForm({ account, details }: { account: string, detai
             setErrors({ submit: (err as Error).message });
             setSubmitting(false);
         }
+    }
+
+  return (
+    <Formik
+        initialValues={{
+            firstname: '',
+            lastname: '',
+            contact: '',
+            message: '',
+            dNote: '',
+            fRemarks: '',
+            deliveryDate: new Date(),
+            submit: null
         }}
+        validationSchema={Yup.object().shape({
+            firstname: Yup.string().max(50).required("Recipient firstname is required."),
+            lastname: Yup.string().max(50).required("Recipient lastname is required."),
+            contact: Yup.string().min(10).max(12).required("Recipient contact number is required."),
+            message: Yup.string().max(250).required("Dedication message is required."),
+            dNote: Yup.string().max(250),
+            fRemarks: Yup.string().max(250),
+            deliveryDate: Yup.date().required("Delivery date is required.")
+        })}
+        onSubmit={() => console.log("Submitted.")}
     >
-        {({ errors, handleBlur, handleChange, handleSubmit, setFieldValue, isSubmitting, touched, values }) => (
-            <Grid component="form" noValidate onSubmit={handleSubmit} container spacing={2} justifyContent="space-between">
-                <Grid item xs={12} sm={12} md={6}>
+        {formikProps => {
+            const { errors, handleBlur, handleChange, setFieldValue, isSubmitting, touched, values } = formikProps;
+            return (
+            <Grid container spacing={2} justifyContent="space-between">
+                <Grid item xs={12} sm={12} md={6} order={{ xs: 2, sm: 2, md: 1 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
                             <TextField 
@@ -244,27 +270,40 @@ export default function OrderForm({ account, details }: { account: string, detai
                         )}
                         <Grid item xs={12} md={12}>
                             <LoadingButton 
+                                onClick={() => handleSubmitButtonClick(false, formikProps)}
                                 disableElevation
                                 loading={isSubmitting}
                                 fullWidth
                                 size="large"
-                                type="submit"
                                 variant="contained"
                                 color="primary"
                             >
                                 Place Order
                             </LoadingButton>
                         </Grid> 
+                        <Grid item xs={12} md={12}>
+                            <LoadingButton 
+                                onClick={() => handleSubmitButtonClick(true, formikProps)}
+                                disableElevation
+                                loading={isSubmitting}
+                                fullWidth
+                                size="large"
+                                variant="outlined"
+                                color="primary"
+                            >
+                                Add To Cart
+                            </LoadingButton>
+                        </Grid> 
                     </Grid>
                 </Grid>
-                <Grid item xs={12} sm={12} md={6}>
+                <Grid item xs={12} sm={12} md={6} order={{ xs: 1, sm: 1, md: 2 }}>
                     <LocationForm 
                         location={currentLocation}
                         changeLocation={(location) => setCurrentLocation(location)}
                     />
                 </Grid>
             </Grid>
-        )}
+        )}}
     </Formik>
   )
 }
