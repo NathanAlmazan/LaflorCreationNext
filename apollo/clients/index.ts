@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { Orders } from "../orders";
 
 export interface Account {
     uid: string;
@@ -10,6 +11,8 @@ export interface Client {
     accountUid: string | null;
     clientName: string;
     clientContact: string;
+    clientOrders: Orders[];
+    orderCount: number;
 }
 
 export interface Recipient {

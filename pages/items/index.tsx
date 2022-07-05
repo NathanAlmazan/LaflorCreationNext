@@ -33,7 +33,7 @@ export default function ItemsPage({ items }: ItemsPageProps) {
         >
           <PageTitleWrapper>
               <PageHeader 
-                title={"Bouquets & Flowers"}
+                title={"La Flor's Bouquets"}
                 subtitle="Fresh and aesthetic bouquets for your love ones."
               />
           </PageTitleWrapper>

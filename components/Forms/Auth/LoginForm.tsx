@@ -25,6 +25,9 @@ import { Formik } from 'formik';
 // firebase
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "../../../config/firebase/client";
+// apollo
+import { useMutation } from "@apollo/client";
+import { CREATE_CLIENT, ClientVars, Client } from "../../../apollo/clients";
 
 const FirebaseSocial = dynamic(() => import('./FirebaseSocial'), { ssr: false });
 
@@ -38,6 +41,11 @@ const AuthLogin = () => {
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
+
+    const [createClient, { error }] = useMutation<
+        { createClient: Client },
+        { client: ClientVars }
+    >(CREATE_CLIENT);
 
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -168,7 +176,7 @@ const AuthLogin = () => {
                                 </Divider>
                             </Grid>
                             <Grid item xs={12}>
-                                <FirebaseSocial />
+                                <FirebaseSocial createClient={createClient} />
                             </Grid>
                         </Grid>
                     </form>

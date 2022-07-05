@@ -14,9 +14,11 @@ import {
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from '../SidebarContext';
 import CloseTwoToneIcon from '@mui/icons-material/CloseTwoTone';
+import Image from "next/image";
 
 import HeaderButtons from './Buttons';
 import HeaderUserbox from './Userbox';
+import { useAuth } from '../../../providers/AuthProvider';
 //import HeaderMenu from './Menu';
 
 const HeaderWrapper = styled(Box)(
@@ -35,6 +37,7 @@ const HeaderWrapper = styled(Box)(
 );
 
 function Header() {
+  const { user } = useAuth();
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
   const theme = useTheme();
 
@@ -71,15 +74,24 @@ function Header() {
             display: 'inline-block'
           }}
         >
-          <Tooltip arrow title="Toggle Menu">
-            <IconButton color="primary" onClick={toggleSidebar}>
-              {!sidebarToggle ? (
-                <MenuTwoToneIcon fontSize="small" />
-              ) : (
-                <CloseTwoToneIcon fontSize="small" />
-              )}
-            </IconButton>
-          </Tooltip>
+          {user ? (
+             <Tooltip arrow title="Toggle Menu">
+              <IconButton color="primary" onClick={toggleSidebar}>
+                {!sidebarToggle ? (
+                  <MenuTwoToneIcon fontSize="small" />
+                ) : (
+                  <CloseTwoToneIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Image 
+              src="/images/logo.png"
+              alt="logo"
+              width={50}
+              height={50}
+            />
+          )}
         </Box>
       </Stack>
       <Box display="flex" alignItems="center">

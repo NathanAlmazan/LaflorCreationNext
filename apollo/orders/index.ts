@@ -38,7 +38,7 @@ export interface OrderDetails {
     itemCode: string;
     quantity: number;
     discountCode: string;
-    totalPrice: number;
+    finalPrice: number;
     item: Items;
     discount: Discount;
 }
@@ -57,11 +57,21 @@ export interface Orders {
     recipientId: number;
     recipient: Recipient;
     riderId: number;
+    paymentId: string | null;
     orderDetails: OrderDetails[];
 }
 
 export interface GetOrderVars {
     orderUid: string;
+}
+
+export type PaymentType = "GCASH" | "GRAB_PAY" | "CARD";
+
+export interface OrderPayment {
+  sourceId: string;
+  paymentId: string | null;
+  callbackUrl: string;
+  paymentDate: string | null;
 }
 
 export const CREATE_ORDER = gql`
@@ -80,14 +90,29 @@ mutation CreateOrder($details: [OrderDetailInput]!) {
 }
 `
 
+export const DELETE_ORDER = gql`
+mutation DeleteOrder($orderUid: String!) {
+  deleteOrder(orderUid: $orderUid) {
+    orderUid
+  }
+}
+`
+
 export const GET_ORDER_BY_UID = gql`
 query OrderById($orderUid: String!) {
     orderById(orderUid: $orderUid) {
+      orderUid
       amount
+      paymentId
+      mop
       recipient {
         recipientName
+        recipientStreet
+        recipientCity
+        recipientProvince
       }
       orderDetails {
+        itemCode
         finalPrice
         quantity
         item {
@@ -98,4 +123,95 @@ query OrderById($orderUid: String!) {
       }
     }
   }
+`
+
+export const CONFIRM_PAYMENT = gql`
+mutation ConfirmPayment($orderUid: String!) {
+  confirmPayment(orderUid: $orderUid) {
+    sourceId
+    paymentId
+  }
+}
+`
+
+export const CREATE_PAYMENT = gql`
+mutation CreatePayment($orderUid: [String]!, $type: PaymentType!) {
+	createPayment(orderUid: $orderUid, paymentType: $type) {
+    sourceId
+    callbackUrl
+  }
+}
+`
+export interface CreatePaymentIntentVars {
+  uid: string[];
+  type: PaymentType;
+}
+
+export const CREATE_PAYMENT_INTENT = gql`
+mutation CreatePaymentIntent($uid:[String]!, $type: PaymentType!) {
+  createPaymentIntent(orderUid: $uid, paymentType: $type) {
+    sourceId
+    paymentId
+    callbackUrl
+    paymentDate
+  }
+}
+`
+
+export interface  CardPaymentInput {
+  cardNumber: string;
+  expMonth: number;
+  expYear: number;
+  cvcNumber: number;
+  paymentType: PaymentType;
+}
+
+export const PAY_WITH_CARD = gql`
+mutation PayWithCard($uid:[String]!, $card: CardPaymentInput!) {
+  payWithCard(orderUid: $uid, card: $card) {
+    sourceId
+    paymentId
+    callbackUrl
+    paymentDate
+  }
+}
+`
+
+export const GET_ORDER_COUNT = gql`
+query ClientByAccount($uid: String!) {
+  clientByAccount(uid: $uid) {
+    orderCount
+  }
+}
+`
+
+export const GET_ORDER_BY_ACCOUNT = gql`
+query ClientByAccount($uid: String!) {
+  clientByAccount(uid: $uid) {
+    clientName
+    clientOrders {
+      orderUid
+      amount
+      paymentId
+      status
+      mop
+      recipient {
+        recipientName
+        recipientStreet
+        recipientCity
+        recipientProvince
+      }
+      orderDetails {
+        itemCode
+        finalPrice
+        quantity
+        item {
+          itemName
+          itemImage
+          isAddon
+        }
+      }
+    }
+  }
+}
 `

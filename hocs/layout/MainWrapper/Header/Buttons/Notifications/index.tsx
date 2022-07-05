@@ -1,20 +1,18 @@
 import {
   alpha,
   Badge,
-  Box,
-  Divider,
   IconButton,
-  List,
-  ListItem,
-  Popover,
   Tooltip,
-  Typography
 } from '@mui/material';
-import { useRef, useState } from 'react';
-import NotificationsActiveTwoToneIcon from '@mui/icons-material/NotificationsActiveTwoTone';
+import { useRouter } from "next/router";
+import ShoppingCartTwoToneIcon from '@mui/icons-material/ShoppingCartTwoTone';
 import { styled } from '@mui/material/styles';
 
-import { formatDistance, subDays } from 'date-fns';
+import { useQuery } from '@apollo/client';
+import { Client } from '../../../../../../apollo/clients';
+import { GET_ORDER_COUNT } from '../../../../../../apollo/orders';
+import { useAuth } from '../../../../../providers/AuthProvider';
+import { useEffect, useState } from 'react';
 
 const NotificationsBadge = styled(Badge)(
   ({ theme }) => `
@@ -40,83 +38,44 @@ const NotificationsBadge = styled(Badge)(
 `
 );
 
+interface OrderByAccountVars {
+  uid: string;
+}
+
 function HeaderNotifications() {
-  const ref = useRef<any>(null);
-  const [isOpen, setOpen] = useState<boolean>(false);
+  const { user } = useAuth();
+  const router = useRouter();
+  const [unpaidOrders, setUnpaidOrders] = useState<number>(0);
 
-  const handleOpen = (): void => {
-    setOpen(true);
-  };
+  const { data, error } = useQuery<Client, OrderByAccountVars>(
+    GET_ORDER_COUNT,
+    {variables: {
+      uid: user?.uid as string
+    },
+    skip: user === null
+    }
+  );
 
-  const handleClose = (): void => {
-    setOpen(false);
-  };
+  useEffect(() => {
+    if (data) {
+      setUnpaidOrders(state => data.orderCount);
+    } else console.log(error);
+  }, [data, error]);
 
   return (
-    <>
-      <Tooltip arrow title="Notifications">
-        <IconButton color="primary" ref={ref} onClick={handleOpen}>
+      <Tooltip arrow title="View Cart">
+        <IconButton color="primary" disabled={user === null} onClick={() => router.push('/cart')}>
           <NotificationsBadge
-            badgeContent={1}
+            badgeContent={unpaidOrders}
             anchorOrigin={{
               vertical: 'top',
               horizontal: 'right'
             }}
           >
-            <NotificationsActiveTwoToneIcon />
+            <ShoppingCartTwoToneIcon />
           </NotificationsBadge>
         </IconButton>
       </Tooltip>
-      <Popover
-        anchorEl={ref.current}
-        onClose={handleClose}
-        open={isOpen}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
-        }}
-      >
-        <Box
-          sx={{ p: 2 }}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Typography variant="h5">Notifications</Typography>
-        </Box>
-        <Divider />
-        <List sx={{ p: 0 }}>
-          <ListItem
-            sx={{ p: 2, minWidth: 350, display: { xs: 'block', sm: 'flex' } }}
-          >
-            <Box flex="1">
-              <Box display="flex" justifyContent="space-between">
-                <Typography sx={{ fontWeight: 'bold' }}>
-                  Messaging Platform
-                </Typography>
-                <Typography variant="caption" sx={{ textTransform: 'none' }}>
-                  {formatDistance(subDays(new Date(), 3), new Date(), {
-                    addSuffix: true
-                  })}
-                </Typography>
-              </Box>
-              <Typography
-                component="span"
-                variant="body2"
-                color="text.secondary"
-              >
-                {' '}
-                new messages in your inbox
-              </Typography>
-            </Box>
-          </ListItem>
-        </List>
-      </Popover>
-    </>
   );
 }
 

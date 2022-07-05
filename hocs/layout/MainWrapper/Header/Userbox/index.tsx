@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -10,15 +10,19 @@ import {
   ListItem,
   ListItemText,
   Popover,
-  Typography
+  Typography,
+  Stack
 } from '@mui/material';
 
-import InboxTwoToneIcon from '@mui/icons-material/InboxTwoTone';
 import { styled } from '@mui/material/styles';
 import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 import AccountBoxTwoToneIcon from '@mui/icons-material/AccountBoxTwoTone';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
+import { useAuth } from '../../../../providers/AuthProvider';
+import { firebaseAuth } from "../../../../../config/firebase/client"
+import { signOut } from "firebase/auth";
+import { useRouter } from 'next/router';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -55,12 +59,31 @@ const UserBoxDescription = styled(Typography)(
 `
 );
 
+type UserBox = {
+  name: string,
+  avatar: string,
+  email: string
+};
+
 function HeaderUserbox() {
-  const user = {
-    name: 'Catherine Pike',
-    avatar: '/static/images/avatars/1.jpg',
-    jobtitle: 'Project Manager'
-  };
+  const { user } = useAuth();
+  const router = useRouter();
+  const [userInfo, setUserInfo] = useState<UserBox>({
+    avatar: '',
+    email: '',
+    name: ''
+  });
+  const { avatar, email, name } = userInfo;
+
+  useEffect(() => {
+    if (user) {
+      setUserInfo(state => ({
+        avatar: user.photoURL as string,
+        email: `${(user.email as string).slice(0, 20)}...`,
+        name: user.displayName as string
+      }))
+    }
+  }, [user])
 
   const ref = useRef<any>(null);
   const [isOpen, setOpen] = useState<boolean>(false);
@@ -73,69 +96,80 @@ function HeaderUserbox() {
     setOpen(false);
   };
 
+  const logOut = async () => {
+    await signOut(firebaseAuth);
+    router.push("/login");
+
+  }
+
   return (
     <>
-      <UserBoxButton color="secondary" ref={ref} onClick={handleOpen}>
-        <Avatar variant="rounded" alt={user.name} src={user.avatar} />
-        <Hidden mdDown>
-          <UserBoxText>
-            <UserBoxLabel variant="body1">{user.name}</UserBoxLabel>
-            <UserBoxDescription variant="body2">
-              {user.jobtitle}
-            </UserBoxDescription>
-          </UserBoxText>
-        </Hidden>
-        <Hidden smDown>
-          <ExpandMoreTwoToneIcon sx={{ ml: 1 }} />
-        </Hidden>
-      </UserBoxButton>
-      <Popover
-        anchorEl={ref.current}
-        onClose={handleClose}
-        open={isOpen}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
-        }}
-      >
-        <MenuUserBox sx={{ minWidth: 210 }} display="flex">
-          <Avatar variant="rounded" alt={user.name} src={user.avatar} />
-          <UserBoxText>
-            <UserBoxLabel variant="body1">{user.name}</UserBoxLabel>
-            <UserBoxDescription variant="body2">
-              {user.jobtitle}
-            </UserBoxDescription>
-          </UserBoxText>
-        </MenuUserBox>
-        <Divider sx={{ mb: 0 }} />
-        <List sx={{ p: 1 }} component="nav">
-          <ListItem button>
-            <AccountBoxTwoToneIcon fontSize="small" />
-            <ListItemText primary="My Profile" />
-          </ListItem>
-          <ListItem button>
-            <InboxTwoToneIcon fontSize="small" />
-            <ListItemText primary="Messenger" />
-          </ListItem>
-          <ListItem
-            button
+      {user ? (
+        <>
+          <UserBoxButton color="secondary" ref={ref} onClick={handleOpen}>
+            <Avatar variant="rounded" alt={name} src={avatar} />
+            <Hidden mdDown>
+              <UserBoxText>
+                <UserBoxLabel variant="body1">{name}</UserBoxLabel>
+                <UserBoxDescription variant="body2">
+                  {email}
+                </UserBoxDescription>
+              </UserBoxText>
+            </Hidden>
+            <Hidden smDown>
+              <ExpandMoreTwoToneIcon sx={{ ml: 1 }} />
+            </Hidden>
+          </UserBoxButton>
+          <Popover
+            anchorEl={ref.current}
+            onClose={handleClose}
+            open={isOpen}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
           >
-            <AccountTreeTwoToneIcon fontSize="small" />
-            <ListItemText primary="Account Settings" />
-          </ListItem>
-        </List>
-        <Divider />
-        <Box sx={{ m: 1 }}>
-          <Button color="primary" fullWidth>
-            <LockOpenTwoToneIcon sx={{ mr: 1 }} />
-            Sign out
-          </Button>
-        </Box>
-      </Popover>
+            <MenuUserBox sx={{ minWidth: 210 }} display="flex">
+              <Avatar variant="rounded" alt={name} src={avatar} />
+              <UserBoxText>
+                <UserBoxLabel variant="body1">{name}</UserBoxLabel>
+                <UserBoxDescription variant="body2">
+                  {email}
+                </UserBoxDescription>
+              </UserBoxText>
+            </MenuUserBox>
+            <Divider sx={{ mb: 0 }} />
+            <List sx={{ p: 1 }} component="nav">
+              <ListItem button>
+                <AccountBoxTwoToneIcon fontSize="small" />
+                <ListItemText primary="My Profile" />
+              </ListItem>
+              <ListItem
+                button
+              >
+                <AccountTreeTwoToneIcon fontSize="small" />
+                <ListItemText primary="Account Settings" />
+              </ListItem>
+            </List>
+            <Divider />
+            <Box sx={{ m: 1 }}>
+              <Button color="primary" onClick={logOut} fullWidth>
+                <LockOpenTwoToneIcon sx={{ mr: 1 }} />
+                Sign out
+              </Button>
+            </Box>
+          </Popover>
+        </>
+      ) : (
+        <Stack direction="row" spacing={2}>
+          <Button variant="outlined" size="large" onClick={() => router.push("/login")}>Login</Button>
+          <Button variant="contained" size="large" onClick={() => router.push("/register")}>Register</Button>
+        </Stack>
+      )}
     </>
   );
 }
