@@ -32,14 +32,15 @@ const CardCoverAction = styled(Box)(
 
 type CoverCardProps = {
   imageSource?: string;
+  imageLink?: string;
   handleImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const ProfileCover = ({ imageSource, handleImageChange }: CoverCardProps) => {
+const ProfileCover = ({ imageLink, imageSource, handleImageChange }: CoverCardProps) => {
 
   return (
       <CardCover>
-        <CardMedia image={imageSource ? imageSource : "/images/logo.png"} />
+        <CardMedia image={imageSource ? imageSource : imageLink ? imageLink : "/images/logo.png"} />
         <CardCoverAction>
           <Input accept="image/*" id="change-cover" multiple type="file" onChange={handleImageChange} />
           <label htmlFor="change-cover">
@@ -48,7 +49,7 @@ const ProfileCover = ({ imageSource, handleImageChange }: CoverCardProps) => {
               variant="contained"
               component="span"
             >
-              Upload Photo
+              {imageLink ? "Change Photo" : "Upload Photo"}
             </Button>
           </label>
         </CardCoverAction>

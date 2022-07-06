@@ -3,6 +3,7 @@ import { Box, Card, Link, Typography, Stack, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 // components
 import Label from '../Label';
 import { Items } from '../../apollo/items';
@@ -21,7 +22,7 @@ const ProductImgStyle = styled('img')({
 
 // ----------------------------------------------------------------------
 
-export default function ShopProductCard({ product, selected, handleSelect }: { selected?: boolean, product: Items,  handleSelect?: () => void }) {
+export default function ShopProductCard({ admin, product, selected, handleSelect }: { admin?: boolean, selected?: boolean, product: Items,  handleSelect?: () => void }) {
   const router = useRouter();
   const { itemName, itemImage, discount, discountCode, itemPrice, itemCode, isAddon } = product;
   
@@ -56,14 +57,24 @@ export default function ShopProductCard({ product, selected, handleSelect }: { s
         </Link>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Button
-            disabled={Boolean(selected)}
-            variant="contained"
-            startIcon={isAddon ? <AddOutlinedIcon /> : <AddShoppingCartRoundedIcon />}
-            onClick={Boolean(isAddon && handleSelect) ? handleSelect : handleOrderNow}
-          >
-            {isAddon ? "Add Item" : "Order Now"}
-          </Button>
+          {admin ? (
+            <Button 
+              variant="contained"
+              startIcon={<EditTwoToneIcon />}
+              onClick={() => router.push("/items/edit/" + itemCode)}
+            >
+              Edit
+            </Button>
+          ): (
+            <Button
+              disabled={Boolean(selected)}
+              variant="contained"
+              startIcon={isAddon ? <AddOutlinedIcon /> : <AddShoppingCartRoundedIcon />}
+              onClick={Boolean(isAddon && handleSelect) ? handleSelect : handleOrderNow}
+            >
+              {isAddon ? "Add Item" : "Order Now"}
+            </Button>
+          )}
           <Typography variant="subtitle2">
             <Typography
               component="span"

@@ -11,9 +11,10 @@ type ItemsListProps = {
     selected?: OrderDetails[];
     items: Items[];
     handleSelect?: (item: Items) => void;
+    admin?: boolean;
 }
 
-function ItemsList({ items, handleSelect, selected }: ItemsListProps) {
+function ItemsList({ items, handleSelect, selected, admin }: ItemsListProps) {
   return (
     <Grid container spacing={2} sx={{ mb: 5 }}>
         {items.map(item => (
@@ -21,7 +22,8 @@ function ItemsList({ items, handleSelect, selected }: ItemsListProps) {
                 <ItemCard 
                   product={item} 
                   handleSelect={handleSelect ? () => handleSelect(item) : undefined} 
-                  selected={selected && selected.find(i => i.itemCode === item.itemCode) !== undefined}  
+                  selected={selected && selected.find(i => i.itemCode === item.itemCode) !== undefined} 
+                  admin={admin}
                 />
             </Grid>
         ))}

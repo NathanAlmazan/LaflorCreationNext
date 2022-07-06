@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { Formik } from 'formik';
+import { useRouter } from 'next/router';
 // mui
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -13,30 +14,41 @@ import Checkbox from '@mui/material/Checkbox';
 import LoadingButton from '@mui/lab/LoadingButton';
 import FormHelperText from '@mui/material/FormHelperText';
 // types
-import { CREATE_ITEM, Discount, Items, ItemsVars } from '../../apollo/items';
+import { CREATE_ITEM, Discount, Items, ItemsVars, DELETE_ITEM } from '../../apollo/items';
 import { useMutation } from '@apollo/client';
 
 type CreateItemsProps = {
   discounts: Discount[];
+  item?: Items;
   uploadImage: () => Promise<string | null>;
   resetImage: () => void;
 }
 
-function CreateItems({ discounts, uploadImage, resetImage }: CreateItemsProps) {
-
+function CreateItems({ item, discounts, uploadImage, resetImage }: CreateItemsProps) {
+  const router = useRouter();
   const [createItems, { error }] = useMutation<
     { createItems: Items },
     { item: ItemsVars }
   >(CREATE_ITEM);
+
+  const [deleteItems, { loading }] = useMutation<
+    { deleteItems: Items },
+    { code: string }
+  >(DELETE_ITEM);
+
+  const deleteItemByCode = (code: string) => {
+    deleteItems({ variables: { code } });
+    router.push("/items/admin");
+  }
   
   return (
     <Formik
       initialValues={{
-          itemCode: '',
-          itemName: '',
-          itemPrice: '',
-          isAddon: false,
-          discountCode: 'None',
+          itemCode: item ? item.itemCode : '',
+          itemName: item ? item.itemName : '',
+          itemPrice: item ? item.itemPrice.toFixed(2) : '',
+          isAddon: item ? item.isAddon : false,
+          discountCode: item ? item.discountCode ? item.discountCode : 'None' : 'None',
           submit: null
       }}
       validationSchema={Yup.object().shape({
@@ -48,13 +60,13 @@ function CreateItems({ discounts, uploadImage, resetImage }: CreateItemsProps) {
       onSubmit={async (values, { setErrors, setStatus, setSubmitting, resetForm }) => {
          try {
           const downloadURL = await uploadImage();
-          if (downloadURL) {
+          if (downloadURL || item) {
             createItems({ variables: {
               item: {
                 itemCode: values.itemCode,
                 itemName: values.itemName,
                 itemPrice: parseFloat(values.itemPrice),
-                itemImage: downloadURL,
+                itemImage: downloadURL ? downloadURL : item?.itemImage as string,
                 isAddon: values.isAddon,
                 discountCode: values.discountCode !== "None" ? values.discountCode : null,
               }
@@ -62,8 +74,13 @@ function CreateItems({ discounts, uploadImage, resetImage }: CreateItemsProps) {
 
             setStatus({ success: true });
             setSubmitting(false);
-            resetForm();
-            resetImage();
+            
+            if (!item) {
+              resetForm();
+              resetImage();
+            } else {
+              router.push("/items/admin");
+            }
           } else {
             setErrors({ submit: "Item image is required." });
           }
@@ -78,6 +95,7 @@ function CreateItems({ discounts, uploadImage, resetImage }: CreateItemsProps) {
         <Stack component="form" spacing={3} noValidate onSubmit={handleSubmit} sx={{ p: 3 }}>
           <TextField 
             value={values.itemCode}
+            disabled={item !== undefined}
             name="itemCode"
             onBlur={handleBlur}
             onChange={handleChange}
@@ -174,8 +192,22 @@ function CreateItems({ discounts, uploadImage, resetImage }: CreateItemsProps) {
             variant="contained"
             color="primary"
           >
-            Add Item
+            {item ? "Edit Item" : "Add Item"}
           </LoadingButton>
+
+          {item && (
+             <LoadingButton 
+              disableElevation
+              loading={loading}
+              onClick={() => deleteItemByCode(item.itemCode)}
+              fullWidth
+              size="large"
+              variant="outlined"
+              color="primary"
+            >
+              Delete Item
+            </LoadingButton>
+          )}
         </Stack>
       )}
   </Formik>

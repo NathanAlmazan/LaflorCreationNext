@@ -33,7 +33,7 @@ export interface Items {
 }
 
 export interface ItemsFindVars {
-  addons?: boolean;
+  addons: boolean | null;
 }
 
 export interface ItemsProps {
@@ -89,6 +89,14 @@ query ItemByCode($code: String!) {
     discount {
       discAmount
     }
+  }
+}
+`
+
+export const DELETE_ITEM = gql`
+mutation DeleteItems($code: String!) {
+  deleteItems(itemCode: $code) {
+    itemCode
   }
 }
 `

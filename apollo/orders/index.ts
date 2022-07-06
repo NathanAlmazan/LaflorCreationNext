@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Recipient } from "../clients";
+import { Client, Recipient } from "../clients";
 import { Discount, Items } from "../items";
+import { Rider } from "../riders";
 
 export type OrderStatus = "CRT" | "PND" | "PAID" | "DSP" | "DLV";
 
@@ -59,6 +60,8 @@ export interface Orders {
     riderId: number;
     paymentId: string | null;
     orderDetails: OrderDetails[];
+    client: Client;
+    rider: Rider | null;
 }
 
 export interface GetOrderVars {
@@ -211,6 +214,42 @@ query ClientByAccount($uid: String!) {
           isAddon
         }
       }
+    }
+  }
+}
+`
+
+export const GET_ALL_ORDERS = gql`
+query AllOrders {
+  allOrders {
+    orderUid
+    amount
+    status
+    date
+    time
+    mop
+    client {
+      clientName
+      clientContact
+    }
+    recipient {
+      recipientCity
+      recipientProvince
+      latitude
+      longitude
+    }
+    orderDetails {
+      quantity
+      finalPrice
+      item {
+        itemName
+        isAddon
+      }
+    }
+    rider {
+      riderName
+      riderImage
+      riderContact
     }
   }
 }
