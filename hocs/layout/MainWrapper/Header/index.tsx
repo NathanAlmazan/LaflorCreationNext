@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-
+import { useRouter } from 'next/router';
 import {
   Box,
   alpha,
@@ -38,6 +38,7 @@ const HeaderWrapper = styled(Box)(
 
 function Header() {
   const { user } = useAuth();
+  const router = useRouter();
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
   const theme = useTheme();
 
@@ -74,7 +75,7 @@ function Header() {
             display: 'inline-block'
           }}
         >
-          {user ? (
+          {Boolean(user && user.admin) ? (
              <Tooltip arrow title="Toggle Menu">
               <IconButton color="primary" onClick={toggleSidebar}>
                 {!sidebarToggle ? (
@@ -85,17 +86,19 @@ function Header() {
               </IconButton>
             </Tooltip>
           ) : (
-            <Image 
-              src="/images/logo.png"
-              alt="logo"
-              width={50}
-              height={50}
-            />
+            <div onClick={() => router.push("/")} style={{ cursor: "pointer" }}>
+              <Image 
+                src="/images/logo.png"
+                alt="logo"
+                width={50}
+                height={50}
+              />
+            </div>
           )}
         </Box>
       </Stack>
       <Box display="flex" alignItems="center">
-        <HeaderButtons />
+        <HeaderButtons admin={user ? user.admin : false} />
         <HeaderUserbox />
       </Box>
     </HeaderWrapper>

@@ -66,6 +66,7 @@ function LocationForm({ location, changeLocation }: LocationFormProps) {
                 panTo={panTo} 
                 setLocation={(location) => handleLocationChange(location)}
                 clickedLocation={clickedLocation}
+                location={location}
             />
            )}
             <DeliveryMaps 

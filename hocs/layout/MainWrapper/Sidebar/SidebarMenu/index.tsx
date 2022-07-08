@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+import { useRouter } from 'next/router';
 import {
   ListSubheader,
   alpha,
@@ -155,7 +156,13 @@ const SubMenuWrapper = styled(Box)(
 );
 
 function SidebarMenu() {
+  const router = useRouter();
   const { closeSidebar } = useContext(SidebarContext);
+
+  const handleOptionClicked = (location: string) => {
+    router.push(location);
+    closeSidebar();
+  }
 
   return (
     <>
@@ -166,7 +173,7 @@ function SidebarMenu() {
               <ListItem component="div">
                 <Button
                   disableRipple
-                  onClick={closeSidebar}
+                  onClick={() => handleOptionClicked("/admin/dashboard")}
                   startIcon={<DesignServicesTwoToneIcon />}
                 >
                   Dashboard
@@ -179,7 +186,7 @@ function SidebarMenu() {
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              Classrooms
+              MANAGEMENT
             </ListSubheader>
           }
         >
@@ -188,10 +195,21 @@ function SidebarMenu() {
                 <ListItem component="div">
                   <Button
                     disableRipple
-                    onClick={closeSidebar}
+                    onClick={() => handleOptionClicked("/items/admin")}
                     startIcon={<SchoolTwoToneIcon />}
                   >
-                    Hello World
+                    Bouquets and Flowers
+                  </Button>
+                </ListItem>
+            </List>
+            <List component="div">
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    onClick={() => handleOptionClicked("/transactions")}
+                    startIcon={<SchoolTwoToneIcon />}
+                  >
+                    Transactions and Orders
                   </Button>
                 </ListItem>
             </List>

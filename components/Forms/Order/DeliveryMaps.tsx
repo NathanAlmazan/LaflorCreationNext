@@ -15,17 +15,12 @@ interface Props {
     loadError: Error | undefined;
     location: Location;
     onMapLoad: (map: google.maps.Map) => void;
-    setLocation: (lat: number, lng: number) => void;
+    setLocation?: (lat: number, lng: number) => void;
 }
 
 const mapStyle = {
     width: "100%",
     height: 550
-}
-
-const centerLocation = {
-    lat: 14.657868,
-    lng: 120.950761
 }
 
 const options = {
@@ -36,7 +31,7 @@ const options = {
 function ZoningMap({ isLoaded, loadError, location, onMapLoad, setLocation }: Props) {
 
     const handleMapClick = ((event: google.maps.MapMouseEvent) => {
-        if (event.latLng) {
+        if (event.latLng && setLocation) {
          setLocation(event.latLng.lat(), event.latLng.lng());
         }
      })
@@ -48,7 +43,7 @@ function ZoningMap({ isLoaded, loadError, location, onMapLoad, setLocation }: Pr
       <GoogleMap
         mapContainerStyle={mapStyle}
         zoom={18}
-        center={centerLocation}
+        center={location}
         onClick={handleMapClick}
         options={options}
         onLoad={onMapLoad}

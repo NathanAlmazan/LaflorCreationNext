@@ -1,6 +1,8 @@
 import * as Yup from 'yup';
+import { useState } from 'react';
 import { Formik } from 'formik';
 import { useRouter } from 'next/router';
+import dynamic from "next/dynamic";
 // mui
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -8,14 +10,19 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import IconButton from "@mui/material/IconButton";
+import AddIcon from '@mui/icons-material/Add';
 import Typography from "@mui/material/Typography";
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Tooltip from '@mui/material/Tooltip';
 import Checkbox from '@mui/material/Checkbox';
 import LoadingButton from '@mui/lab/LoadingButton';
 import FormHelperText from '@mui/material/FormHelperText';
 // types
 import { CREATE_ITEM, Discount, Items, ItemsVars, DELETE_ITEM } from '../../apollo/items';
 import { useMutation } from '@apollo/client';
+
+const DiscountDialog = dynamic(() => import("../Dialogs/Discounts"));
 
 type CreateItemsProps = {
   discounts: Discount[];
@@ -26,6 +33,9 @@ type CreateItemsProps = {
 
 function CreateItems({ item, discounts, uploadImage, resetImage }: CreateItemsProps) {
   const router = useRouter();
+  const [discountList, setDiscountList] = useState<Discount[]>(discounts);
+  const [discount, setDiscount] = useState<boolean>(false);
+
   const [createItems, { error }] = useMutation<
     { createItems: Items },
     { item: ItemsVars }
@@ -40,8 +50,17 @@ function CreateItems({ item, discounts, uploadImage, resetImage }: CreateItemsPr
     deleteItems({ variables: { code } });
     router.push("/items/admin");
   }
+
+  const updateDiscountList = (discount: Discount) => {
+    setDiscountList([ ...discountList, discount ]);
+  }
+
+  const removeDiscount = (code: string) => {
+    setDiscountList(discountList.filter(d => d.discCode !== code));
+  }
   
   return (
+  <>
     <Formik
       initialValues={{
           itemCode: item ? item.itemCode : '',
@@ -128,53 +147,62 @@ function CreateItems({ item, discounts, uploadImage, resetImage }: CreateItemsPr
             helperText={Boolean(touched.itemPrice && errors.itemPrice) && errors.itemPrice}
           />
 
-           <FormControl fullWidth>
-            <InputLabel>Discount</InputLabel>
-            <Select
-              name="discountCode"
-              label="Discount"
-              value={values.discountCode}
-              onChange={handleChange}
-              sx={{ color: (theme) => theme.palette.primary.main }}
-            >
-               <MenuItem value="None">
-                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {"None"}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {"₱ 0.00"}
-                    </Typography>
-                  </Stack>
-                </MenuItem>
-              {discounts.map((discount) => (
-                <MenuItem key={discount.discCode} value={discount.discCode}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {discount.discCode}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {"₱ " + discount.discAmount.toFixed(2)}
-                    </Typography>
-                  </Stack>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Stack direction="row" spacing={2}>
+            <FormControl fullWidth>
+              <InputLabel>Discount</InputLabel>
+              <Select
+                name="discountCode"
+                label="Discount"
+                value={values.discountCode}
+                onChange={handleChange}
+                sx={{ color: (theme) => theme.palette.primary.main }}
+              >
+                <MenuItem value="None">
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
+                      <Typography variant="body2" color="text.secondary" noWrap>
+                        {"None"}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        fontWeight="bold"
+                        color="text.primary"
+                        gutterBottom
+                        noWrap
+                      >
+                        {"₱ 0.00"}
+                      </Typography>
+                    </Stack>
+                  </MenuItem>
+                {discountList.map((discount) => (
+                  <MenuItem key={discount.discCode} value={discount.discCode}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
+                      <Typography variant="body2" color="text.secondary" noWrap>
+                        {discount.discCode}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        fontWeight="bold"
+                        color="text.primary"
+                        gutterBottom
+                        noWrap
+                      >
+                        {"₱ " + discount.discAmount.toFixed(2)}
+                      </Typography>
+                    </Stack>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <IconButton onClick={() => setDiscount(true)}>
+              <Tooltip title="Modify Discounts">
+                <AddIcon />
+              </Tooltip>
+            </IconButton>
+          </Stack>
+
           <FormControlLabel control={<Checkbox name="isAddon" value={values.isAddon} onChange={handleChange} />} label="This item is an addon." />
-         
+          
           {errors.submit && (
             <FormHelperText error>{errors.submit}</FormHelperText>
           )}
@@ -210,7 +238,16 @@ function CreateItems({ item, discounts, uploadImage, resetImage }: CreateItemsPr
           )}
         </Stack>
       )}
-  </Formik>
+    </Formik>
+    
+    <DiscountDialog 
+      open={discount}
+      handleClose={() => setDiscount(false)}
+      discounts={discountList}
+      update={updateDiscountList}
+      removed={removeDiscount}
+    />
+  </>
   )
 }
 

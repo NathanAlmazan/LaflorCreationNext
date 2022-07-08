@@ -16,9 +16,10 @@ interface Props {
   }) => void;
   setLocation: (location: Location) => void;
   clickedLocation: string | null;
+  location: Location;
 }
 
-export default function ZoningToolbar({ panTo, setLocation, clickedLocation }: Props) {
+export default function ZoningToolbar({ panTo, setLocation, clickedLocation, location }: Props) {
   const {
       ready,
       value,
@@ -70,7 +71,7 @@ export default function ZoningToolbar({ panTo, setLocation, clickedLocation }: P
             onChange={(event: any, newValue: string | null) => {
               handleSelect(newValue);
             }}
-            inputValue={value}
+            inputValue={value || location.address}
             onInputChange={(event, newInputValue) => {
               setValue(newInputValue);
             }}
@@ -80,8 +81,6 @@ export default function ZoningToolbar({ panTo, setLocation, clickedLocation }: P
               <TextField {...params} 
                 fullWidth placeholder="House No. Street, Barangay..." 
                 variant="outlined"
-                error={value.split(", ").length < 3}
-                helperText={value.split(", ").length < 3 && "Please provide your complete address."}
               />
             }
           />

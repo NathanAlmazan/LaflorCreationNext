@@ -100,3 +100,21 @@ mutation DeleteItems($code: String!) {
   }
 }
 `
+
+export const CREATE_DISCOUNT = gql`
+mutation CreateDiscount($discount:DiscountInput!) {
+  createDiscount(discount: $discount) {
+    discCode
+    discAmount
+  }
+}
+`
+
+export const DELETE_DISCOUNT = gql`
+mutation DeleteDiscount($discount: String!) {
+  deleteDiscount(discCode: $discount) {
+    discCode
+    discAmount
+  }
+}
+`

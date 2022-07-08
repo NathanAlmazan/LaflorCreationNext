@@ -16,6 +16,7 @@ import client from "../../apollo";
 import nookies from "nookies";
 import { admin } from "../../config/firebase/admin";
 import { ALL_ITEMS, ItemsProps, Items, ItemsFindVars, ItemByCodeProps, ITEM_BY_CODE } from "../../apollo/items";
+import { CLIENT_RECIPIENTS, RecipientProps, RecipientVars, Recipient } from "../../apollo/clients";
 import { Account } from "../../apollo/clients";
 
 const ItemsList = dynamic(() => import("../../components/Sections/Items/ItemsList"));
@@ -29,13 +30,14 @@ type OrderPageProps = {
   items: Items[];
   account: Account;
   product: Items;
+  recipients: Recipient[];
 }
 
 interface OrderDetails extends Items {
   quantity: number
 }
 
-export default function OrderItemPage({ items, account, product }: OrderPageProps) {
+export default function OrderItemPage({ items, account, product, recipients }: OrderPageProps) {
   const matches = useMediaQuery('(min-width:900px)');
   const [selected, setSelected] = useState<OrderDetails[]>([]);
   const [open, setOpen] = useState<boolean>(false);
@@ -100,7 +102,7 @@ export default function OrderItemPage({ items, account, product }: OrderPageProp
                           exit={{ opacity: 0, y: 200 }}
                         >
                           <Typography variant="h3" color="primary" sx={{ mb: 2 }}>Recipient Information</Typography>
-                          <OrderForm account={account.uid} details={selected} item={{ ...product, quantity: 1 }} />
+                          <OrderForm recipients={recipients} account={account.uid} details={selected} item={{ ...product, quantity: 1 }} />
                         </motion.div>
                     </AnimatePresence>
                   </Grid>
@@ -140,6 +142,8 @@ export default function OrderItemPage({ items, account, product }: OrderPageProp
   )
 }
 
+
+
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const { query } = ctx;
     try {
@@ -161,6 +165,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
           code: query.itemCode as string
         }
       });
+
+      const { data: recipients } = await client.query<RecipientProps, RecipientVars>({
+        query: CLIENT_RECIPIENTS,
+        variables: {
+          id: uid
+        }
+      })
     
       if (!item.itemByCode) return {
         notFound: true,
@@ -170,7 +181,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         props: {
           items: itemsList.allItems,
           account: { uid, email },
-          product: item.itemByCode
+          product: item.itemByCode,
+          recipients: recipients.clientRecipients
         }
       }
   

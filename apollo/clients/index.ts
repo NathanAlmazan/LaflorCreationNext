@@ -32,6 +32,14 @@ export interface ClientVars {
     clientContact: string;
 }
 
+export interface RecipientProps {
+    clientRecipients: Recipient[];
+}
+
+export interface RecipientVars {
+    id: string;
+}
+
 export const CREATE_CLIENT = gql`
 mutation createClient($client: ClientInput!) {
     createClient(client: $client) {
@@ -39,6 +47,21 @@ mutation createClient($client: ClientInput!) {
         accountUid
         clientName
         clientContact
+    }
+  }
+`
+
+export const CLIENT_RECIPIENTS = gql`
+query ClientRecipients($id: String!) {
+    clientRecipients(account: $id) {
+        recipientId
+        recipientName
+        recipientContact
+        recipientStreet
+        recipientCity
+        recipientProvince
+        latitude
+        longitude
     }
   }
 `

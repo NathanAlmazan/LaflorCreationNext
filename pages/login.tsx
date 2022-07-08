@@ -3,6 +3,7 @@ import { Grid, Stack, Typography } from '@mui/material';
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useAuth } from '../hocs/providers/AuthProvider';
+import Link from "next/link";
 
 const AuthLogin = dynamic(() => import('../components/Forms/Auth/LoginForm'));
 
@@ -17,7 +18,7 @@ export default function LoginPage() {
                 <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: { xs: -0.5, sm: 0.5 } }}>
                     <Typography variant="h3">Login</Typography>
                     <Typography variant="body1" sx={{ textDecoration: 'none' }} color="primary">
-                        Don&apos;t have an account?
+                        <Link href="/register">Don&apos;t have an account?</Link>
                     </Typography>
                 </Stack>
             </Grid>

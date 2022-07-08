@@ -18,6 +18,7 @@ export interface OrderInput {
 }
 
 export interface RecipientInput {
+    recipientId?: number;
     recipientName: string;
     recipientContact: string;
     recipientStreet: string;
@@ -228,6 +229,9 @@ query AllOrders {
     date
     time
     mop
+    fRemarks
+    message
+    dNotes
     client {
       clientName
       clientContact
@@ -240,6 +244,7 @@ query AllOrders {
     }
     orderDetails {
       quantity
+      discountCode
       finalPrice
       item {
         itemName
@@ -251,6 +256,14 @@ query AllOrders {
       riderImage
       riderContact
     }
+  }
+}
+`
+
+export const SET_ORDER_DELIVERED = gql`
+mutation SetOrderDelivered($uid: String!) {
+  setOrderDelivered(orderUid: $uid) {
+    orderUid
   }
 }
 `

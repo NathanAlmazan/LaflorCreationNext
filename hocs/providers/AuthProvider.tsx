@@ -3,7 +3,13 @@ import { User } from "firebase/auth";
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { setCookie } from 'nookies';
 
-const AuthContext = createContext<{ user: User | null }>({
+interface CustomUser extends User {
+  admin: boolean;
+}
+
+const adminEmails = ["nathanael.almazan@gmail.com", "admin.account@laflorcreation.com"];
+
+const AuthContext = createContext<{ user: CustomUser | null }>({
   user: null,
 });
 
@@ -12,7 +18,7 @@ export const useAuth = () => {
 };
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<CustomUser | null>(null);
 
   useEffect(() => {
     return firebaseAuth.onIdTokenChanged(async (user) => {
@@ -21,7 +27,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         setCookie(null, 'token', '', { path: '/' });
       } else {
         const token = await user.getIdToken();
-        setUser(user);
+
+        if (adminEmails.includes(user.email as string)) setUser({ ...user, admin: true });
+        else setUser({ ...user, admin: false });
+
         setCookie(null, 'token', token, {
           maxAge: 30 * 60 * 1000,
           path: '/',

@@ -1,14 +1,11 @@
 import { FC, ChangeEvent, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Tooltip,
   Divider,
   Box,
   FormControl,
   InputLabel,
   Card,
-  Checkbox,
-  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -17,20 +14,18 @@ import {
   TableRow,
   TableContainer,
   MenuItem,
-  Typography,
-  useTheme,
   CardHeader
 } from '@mui/material';
 import dynamic from "next/dynamic";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Label from './Label';
-import { Orders, OrderStatus } from "../../../apollo/orders";
-import DeliveryDiningTwoToneIcon from '@mui/icons-material/DeliveryDiningTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import BulkActions from './BulkActions';
-import { capitalCase } from 'change-case';
+import { Orders, OrderStatus, SET_ORDER_DELIVERED } from "../../../apollo/orders";
+// apollo
+import { useMutation } from '@apollo/client';
 
 const AssignRiderDialog = dynamic(() => import("./AssignRider"));
+const MapDialog = dynamic(() => import("./MapDialog"));
+const Row = dynamic(() => import("./TransactionRow"));
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -46,6 +41,11 @@ interface AssignRiderProps {
   orderUid: string;
   city: string;
   province: string;
+}
+
+interface Location {
+  lat: number;
+  lng: number;
 }
 
 const getStatusLabel = (cryptoOrderStatus: OrderStatus): JSX.Element => {
@@ -101,16 +101,13 @@ const applyPagination = (
 };
 
 const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ clientOrders, update }) => {
-  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
-    []
-  );
-  const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
     status: undefined
   });
   const [assign, setAssign] = useState<AssignRiderProps>();
+  const [location, setLocation] = useState<Location>();
 
   const statusOptions = [
     {
@@ -142,32 +139,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ clientOrders, update })
     }));
   })
 
-  const handleSelectAllCryptoOrders = (
-    event: ChangeEvent<HTMLInputElement>
-  ): void => {
-    setSelectedCryptoOrders(
-      event.target.checked
-        ? clientOrders.map((order) => order.orderUid)
-        : []
-    );
-  };
-
-  const handleSelectOneCryptoOrder = (
-    event: ChangeEvent<HTMLInputElement>,
-    cryptoOrderId: string
-  ): void => {
-    if (!selectedCryptoOrders.includes(cryptoOrderId)) {
-      setSelectedCryptoOrders((prevSelected) => [
-        ...prevSelected,
-        cryptoOrderId
-      ]);
-    } else {
-      setSelectedCryptoOrders((prevSelected) =>
-        prevSelected.filter((id) => id !== cryptoOrderId)
-      );
-    }
-  };
-
   const handlePageChange = (event: any, newPage: number): void => {
     setPage(newPage);
   };
@@ -182,28 +153,30 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ clientOrders, update })
     page,
     limit
   );
-  const selectedSomeCryptoOrders =
-    selectedCryptoOrders.length > 0 &&
-    selectedCryptoOrders.length < clientOrders.length;
-  const selectedAllCryptoOrders =
-    selectedCryptoOrders.length === clientOrders.length;
-
-  const theme = useTheme();
 
   const handleAssignClose = () => {
     setAssign(undefined);
     update();
   }
 
+  const [setOrderDelivered, { loading }] = useMutation<
+    { setOrderDelivered: Orders },
+    { uid: string }
+  >(SET_ORDER_DELIVERED);
+
+  const handleOrderDelivered = async (orderUid: string) => {
+    await setOrderDelivered({ variables: {
+      uid: orderUid
+    }});
+    update();
+  }
+
+  const handleAssignRider =  (assign: AssignRiderProps) => setAssign(assign);
+  const handleViewLocation =  (address: Location) => setLocation(address);
+
   return (
     <>
       <Card>
-        {selectedBulkActions && (
-          <Box flex={1} p={2}>
-            <BulkActions />
-          </Box>
-        )}
-        {!selectedBulkActions && (
           <CardHeader
             action={
               <Box width={150}>
@@ -226,20 +199,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ clientOrders, update })
             }
             title="Recent Orders"
           />
-        )}
         <Divider />
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    color="primary"
-                    checked={selectedAllCryptoOrders}
-                    indeterminate={selectedSomeCryptoOrders}
-                    onChange={handleSelectAllCryptoOrders}
-                  />
-                </TableCell>
+                <TableCell padding="checkbox" />
                 <TableCell>Client Details</TableCell>
                 <TableCell>Order ID</TableCell>
                 <TableCell>Delivery Details</TableCell>
@@ -250,128 +215,17 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ clientOrders, update })
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedCryptoOrders.map((order) => {
-                const isCryptoOrderSelected = selectedCryptoOrders.includes(
-                  order.orderUid
-                );
-                return (
-                  <TableRow
-                    hover
-                    key={order.orderUid}
-                    selected={isCryptoOrderSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isCryptoOrderSelected}
-                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                          handleSelectOneCryptoOrder(event, order.orderUid)
-                        }
-                        value={isCryptoOrderSelected}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="body1"
-                        fontWeight="bold"
-                        color="text.primary"
-                        gutterBottom
-                        noWrap
-                      >
-                        {order.client.clientName}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" noWrap>
-                        {order.client.clientContact}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="body1"
-                        fontWeight="bold"
-                        color="text.primary"
-                        gutterBottom
-                        noWrap
-                      >
-                        {order.orderUid}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="body1"
-                        fontWeight="bold"
-                        color="text.primary"
-                        gutterBottom
-                        noWrap
-                      >
-                        {order.recipient.recipientCity + ", " + order.recipient.recipientProvince}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" noWrap>
-                        {new Date(`${order.date}T${order.time}`).toLocaleString()}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="body1"
-                        fontWeight="bold"
-                        color="text.primary"
-                        gutterBottom
-                        noWrap
-                      >
-                        {order.rider ? order.rider.riderName : 'Unassigned'}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" noWrap>
-                        {order.rider ? order.rider.riderContact : ''}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography
-                        variant="body1"
-                        fontWeight="bold"
-                        color="text.primary"
-                        gutterBottom
-                        noWrap
-                      >
-                        {"₱ " + order.amount.toFixed(2)}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" noWrap>
-                        {order.mop ? capitalCase(order.mop) : 'Unpaid'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      {getStatusLabel(order.status)}
-                    </TableCell>
-                    <TableCell align="right">
-                      <Tooltip title="Assign Rider" arrow>
-                        <IconButton
-                          sx={{
-                            '&:hover': {
-                              background: theme.colors.primary.lighter
-                            },
-                            color: theme.palette.primary.main
-                          }}
-                          color="inherit"
-                          size="small"
-                          onClick={() => setAssign({ orderUid: order.orderUid, city: order.recipient.recipientCity, province: order.recipient.recipientProvince })}
-                        >
-                          <DeliveryDiningTwoToneIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete Order" arrow>
-                        <IconButton
-                          sx={{
-                            '&:hover': { background: theme.colors.error.lighter },
-                            color: theme.palette.error.main
-                          }}
-                          color="inherit"
-                          size="small"
-                        >
-                          <DeleteTwoToneIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              {paginatedCryptoOrders.map((order) => (
+                <Row 
+                  key={order.orderUid}
+                  order={order}
+                  getStatusLabel={getStatusLabel}
+                  setAssign={handleAssignRider}
+                  setLocation={handleViewLocation}
+                  setDelivered={handleOrderDelivered}
+                />
+              )
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -394,6 +248,13 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ clientOrders, update })
           province={assign.province}
           orderUid={assign.orderUid}
           handleClose={handleAssignClose}
+        />
+      )}
+      {location && (
+        <MapDialog 
+          open={location !== undefined}
+          handleClose={() => setLocation(undefined)}
+          location={location}
         />
       )}
     </>

@@ -4,6 +4,10 @@ import { Formik, FormikProps } from 'formik';
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import InputAdornment from '@mui/material/InputAdornment';
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
 import LoadingButton from '@mui/lab/LoadingButton';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -17,6 +21,7 @@ import { CREATE_ORDER, CREATE_ORDER_DETAIL, OrderDetailInput, OrderInput, Orders
 import { Items } from '../../../apollo/items';
 // next
 import { useRouter } from "next/router";
+import { Recipient } from '../../../apollo/clients';
 
 type Location = {
     lat: number,
@@ -29,6 +34,7 @@ interface OrderDetails extends Items {
 }
 
 interface IFormValues {
+    recipientId: number;
     firstname: string;
     lastname: string;
     contact: string;
@@ -39,7 +45,7 @@ interface IFormValues {
     submit: null;
 }
 
-export default function OrderForm({ account, details, item }: { account: string, details: OrderDetails[], item: OrderDetails }) {
+export default function OrderForm({ account, details, item, recipients }: { recipients: Recipient[], account: string, details: OrderDetails[], item: OrderDetails }) {
     const router = useRouter();
     const [currentLocation, setCurrentLocation] = useState<Location>({
         lat: 14.657868,
@@ -82,6 +88,7 @@ export default function OrderForm({ account, details, item }: { account: string,
                         status: "PND"
                     },
                     recipient: {
+                        recipientId: values.recipientId !== 0 ? values.recipientId : undefined,
                         recipientName: values.firstname + " " + values.lastname,
                         recipientContact: values.contact,
                         recipientStreet: address.split(", ").length > 4 ? address.split(", ")[0] + " " + address.split(", ")[1] : address.split(", ")[0],
@@ -125,9 +132,18 @@ export default function OrderForm({ account, details, item }: { account: string,
         }
     }
 
+    const handleSetAddress = (street: string, city: string, province: string, lat: number, lng: number) => {
+        setCurrentLocation({
+            lat: lat,
+            lng: lng,
+            address: [street, city, province].join(", ")
+        });
+    }
+
   return (
     <Formik
         initialValues={{
+            recipientId: 0,
             firstname: '',
             lastname: '',
             contact: '',
@@ -154,6 +170,40 @@ export default function OrderForm({ account, details, item }: { account: string,
             <Grid container spacing={2} justifyContent="space-between">
                 <Grid item xs={12} sm={12} md={6} order={{ xs: 2, sm: 2, md: 1 }}>
                     <Grid container spacing={2}>
+                        {recipients.length > 0 && (
+                            <Grid item xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label">Select Recipient</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={values.recipientId === 0 ? "" : values.recipientId}
+                                        label="Select Recipient"
+                                        onChange={(e) => {
+                                            const recipient = recipients.find(r => r.recipientId === e.target.value);
+
+                                            if (recipient) {
+                                                setFieldValue('firstname', recipient.recipientName.split(" ")[0]);
+                                                setFieldValue('lastname', recipient.recipientName.split(" ")[1]);
+                                                setFieldValue('contact', recipient.recipientContact);
+                                                setFieldValue('recipientId', recipient.recipientId);
+                                                handleSetAddress(
+                                                    recipient.recipientStreet,
+                                                    recipient.recipientCity, 
+                                                    recipient.recipientProvince,
+                                                    recipient.latitude, 
+                                                    recipient.longitude
+                                                );
+                                            }
+                                        }}
+                                    >
+                                    {recipients.map(r => (
+                                        <MenuItem key={r.recipientId} value={r.recipientId}>{r.recipientName}</MenuItem>
+                                    ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
                         <Grid item xs={12} md={6}>
                             <TextField 
                                 value={values.firstname}
