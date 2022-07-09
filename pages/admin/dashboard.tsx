@@ -35,7 +35,6 @@ interface AdminDashboardProps {
 
 export default function AdminDashboard({ sales, orders, provinces }: AdminDashboardProps) {
   const theme = useTheme();
-  const { user } = useAuth();
   return (
     <>
         <Head>
@@ -49,7 +48,7 @@ export default function AdminDashboard({ sales, orders, provinces }: AdminDashbo
             >
                 <PageTitleWrapper>
                     <PageHeader 
-                        title={user ? "Good Day, " + capitalCase(user?.displayName as string) : "Good Day"}
+                        title={"Admin Dashboard"}
                         subtitle="Monitor your business activities here."
                     />
                 </PageTitleWrapper>
