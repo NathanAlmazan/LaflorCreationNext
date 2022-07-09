@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Items } from "../../../apollo/items";
+import { useAuth } from "../../../hocs/providers/AuthProvider";
 
 const ProductCard = dynamic(() => import("./ProductCard"));
 const Divider = dynamic(() => import("./Divider"));
@@ -19,6 +20,7 @@ type ItemsPageProps = {
 
 
 export default function GalleryContainer({ items }: ItemsPageProps) {
+    const { user } = useAuth();
     const { ref, inView } = useInView();
     const [preview, setPreview] = useState<boolean>(false);
     const router = useRouter();
@@ -44,7 +46,7 @@ export default function GalleryContainer({ items }: ItemsPageProps) {
                             </Typography>
                             <Divider position="center" />
                             <Typography component="h1" variant="h4" color="secondary" align="center">
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi unde impedit, necessitatibus, soluta sit quam minima expedita atque corrupti reiciendis.
+                                We are offering free delivery to all of our products. So, what are you waiting for? Choose bouquet that suits you occassion or the feelings you want to convey today.
                             </Typography>
                         </motion.div>
                     )}
@@ -80,9 +82,11 @@ export default function GalleryContainer({ items }: ItemsPageProps) {
                         transition={{ delay: 0.3 }}
                         exit={{ opacity: 0 }}
                     >
-                        <Button variant="contained" color="primary" size="large" onClick={() => router.push("/items")}>
-                            See All Bouquet
-                        </Button>
+                        {!Boolean(user && user.admin) && (
+                            <Button variant="contained" color="primary" size="large" onClick={() => router.push("/items")}>
+                                See All Bouquet
+                            </Button>
+                        )}
                     </motion.div>
                 )}
             </Stack>

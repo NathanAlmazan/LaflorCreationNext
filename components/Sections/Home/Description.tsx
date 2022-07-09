@@ -44,10 +44,10 @@ export default function DescriptionContainer() {
                                         </Typography>
                                         <Divider position="flex-start" />
                                         <Typography component="p" variant="body1" lineHeight={1.5} mb={2}>
-                                            The company was established in 2020 in Caloocan City to supply foundation, ground engineering, and construction equipment along with contractors operating here in the Philippines.
+                                            Propelled by our affection for flowers and energy about nature, it is our obsession to make creative and noteworthy plant and new flower courses of action. We trust that the best, freshest flowers deliver the most noteworthy presentations.
                                         </Typography>
                                         <Typography component="p" variant="body1" lineHeight={1.5} mb={4}>
-                                            Our products include a vibratory hammer, hydraulic breaker, vibratory ripper, quick coupler, stone grapple, hydraulic compactor, and other various excavator attachments. We are also serving special products such as steel sheet piles, fabricated steel pipes or casings, drilling buckets, drilling augers, tremie pipe, bentonite mixer, and powder.
+                                            La Flor Creation is glad to give quality flowers to our customers. Our retail premises opened in 2012 and we owe quite a bit of our prosperity to our extraordinary customers who move us to make unique and dazzling arrangements until today. Our master staff is here to enable all customers to pick the best flowers and plants for all events and purposes.
                                         </Typography>
                                         <Button variant="contained" color="primary" size="large">Learn More</Button>
                                     </Box>
