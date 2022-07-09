@@ -85,7 +85,7 @@ export default function OrderForm({ account, details, item, recipients }: { reci
                         dNotes: values.dNote,
                         fRemarks: values.fRemarks,
                         riderId: null,
-                        status: "PND"
+                        status: type ? "CRT" : "PND"
                     },
                     recipient: {
                         recipientId: undefined,

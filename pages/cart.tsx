@@ -69,7 +69,7 @@ export default function CardPage({ account, client }: CardPageProps) {
   const [unpaidOrders, setUnpaidOrders] = useState<Orders[]>([]);
 
   useEffect(() => {
-    setUnpaidOrders(state => client.clientOrders.filter(order => order.status === "PND"))
+    setUnpaidOrders(state => client.clientOrders.filter(order => order.status === "CRT"))
   }, [client])
 
   const handleSelectOrder = (uid: string) => {
