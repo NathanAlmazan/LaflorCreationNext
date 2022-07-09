@@ -111,7 +111,7 @@ function HeaderUserbox() {
             <Avatar variant="rounded" alt={name} src={avatar} />
             <Hidden mdDown>
               <UserBoxText>
-                <UserBoxLabel variant="body1">{capitalCase(name)}</UserBoxLabel>
+                <UserBoxLabel variant="body1">{name ? capitalCase(name) : ''}</UserBoxLabel>
                 <UserBoxDescription variant="body2">
                   {email}
                 </UserBoxDescription>
