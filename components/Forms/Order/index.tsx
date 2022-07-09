@@ -88,7 +88,7 @@ export default function OrderForm({ account, details, item, recipients }: { reci
                         status: "PND"
                     },
                     recipient: {
-                        recipientId: values.recipientId !== 0 ? values.recipientId : undefined,
+                        recipientId: undefined,
                         recipientName: values.firstname + " " + values.lastname,
                         recipientContact: values.contact,
                         recipientStreet: address.split(", ").length > 4 ? address.split(", ")[0] + " " + address.split(", ")[1] : address.split(", ")[0],
@@ -156,7 +156,7 @@ export default function OrderForm({ account, details, item, recipients }: { reci
         validationSchema={Yup.object().shape({
             firstname: Yup.string().max(50).required("Recipient firstname is required."),
             lastname: Yup.string().max(50).required("Recipient lastname is required."),
-            contact: Yup.string().min(10).max(12).required("Recipient contact number is required."),
+            contact: Yup.string().min(10).max(10).required("Recipient contact number is required."),
             message: Yup.string().max(250).required("Dedication message is required."),
             dNote: Yup.string().max(250),
             fRemarks: Yup.string().max(250),

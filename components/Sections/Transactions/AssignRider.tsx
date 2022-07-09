@@ -13,6 +13,7 @@ import { blue } from '@mui/material/colors';
 import { Rider, GET_RIDER_BY_AREA, ASSIGN_ORDER } from "../../../apollo/riders";
 import { useMutation, useQuery } from '@apollo/client';
 import { Orders } from '../../../apollo/orders';
+import { useRouter} from "next/router";
 
 interface SimpleDialogProps {
   open: boolean;
@@ -21,6 +22,7 @@ interface SimpleDialogProps {
 }
 
 function SimpleDialog(props: SimpleDialogProps) {
+  const router = useRouter();
   const { onClose, open, riders } = props;
 
   const handleClose = () => {
@@ -45,13 +47,13 @@ function SimpleDialog(props: SimpleDialogProps) {
             <ListItemText primary={rider.riderName} secondary={rider.riderContact} />
           </ListItem>
         ))}
-        <ListItem autoFocus button onClick={() => handleListItemClick(0)}>
+        <ListItem autoFocus button onClick={() => router.push("/riders")}>
           <ListItemAvatar>
             <Avatar>
               <AddIcon />
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary="Add account" />
+          <ListItemText primary="Add Rider" />
         </ListItem>
       </List>
     </Dialog>
@@ -78,7 +80,7 @@ interface RiderVars {
 export default function AssignRider({ open, city, orderUid, province, handleClose }: AssignRiderProps) {
 
   const { data } = useQuery<RidersData, RiderVars>(GET_RIDER_BY_AREA, {
-    variables: { city, province }
+    variables: { city: city.split(" ")[0], province: province }
   })
 
   const [setOrderRider, { loading }] = useMutation<

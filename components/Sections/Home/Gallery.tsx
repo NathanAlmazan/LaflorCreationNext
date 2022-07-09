@@ -29,7 +29,7 @@ export default function GalleryContainer({ items }: ItemsPageProps) {
     
     return (
         <AnimatePresence exitBeforeEnter>
-            <Stack direction="column" spacing={8} justifyContent="center" alignItems="center" sx={{ pt: 10, pb: 10, pl: 3, pr: 3, mt: 10 }}>
+            <Stack direction="column" spacing={8} justifyContent="center" alignItems="center" sx={{ pt: 10, pb: 10, pl: 3, pr: 3, mt: 10, backgroundColor: "#ffff" }}>
                 <Container maxWidth="sm">
                     {preview && (
                         <motion.div

@@ -12,7 +12,7 @@ const defaultOptions: DefaultOptions = {
   }
 
 const client = new ApolloClient({
-    uri: "http://localhost:8000/graphql",
+    uri: "https://laflorcreation.herokuapp.com/graphql",
     cache: new InMemoryCache(),
     defaultOptions: defaultOptions
 });

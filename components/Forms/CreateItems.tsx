@@ -201,7 +201,7 @@ function CreateItems({ item, discounts, uploadImage, resetImage }: CreateItemsPr
             </IconButton>
           </Stack>
 
-          <FormControlLabel control={<Checkbox name="isAddon" value={values.isAddon} onChange={handleChange} />} label="This item is an addon." />
+          <FormControlLabel control={<Checkbox name="isAddon" checked={values.isAddon} onChange={handleChange} />} label="This item is an addon." />
           
           {errors.submit && (
             <FormHelperText error>{errors.submit}</FormHelperText>

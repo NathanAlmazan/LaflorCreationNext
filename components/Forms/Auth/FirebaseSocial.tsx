@@ -28,7 +28,7 @@ const FirebaseSocial = ({ createClient }: FirebaseSocialProps) => {
         signInWithPopup(firebaseAuth, new GoogleAuthProvider()).then(result => {
             if (createClient) {
                 const user = result.user;
-                const contact = user.phoneNumber ? user.phoneNumber : "99999999999";
+                const contact = user.phoneNumber ? user.phoneNumber : "639651268096";
                 const name = user.displayName ? user.displayName : "none";
                 createClient({
                     variables: { client: {
@@ -45,7 +45,7 @@ const FirebaseSocial = ({ createClient }: FirebaseSocialProps) => {
         signInWithPopup(firebaseAuth, new FacebookAuthProvider()).then(result => {
             if (createClient) {
                 const user = result.user;
-                const contact = user.phoneNumber ? user.phoneNumber : "99999999999";
+                const contact = user.phoneNumber ? user.phoneNumber : "639651268096";
                 const name = user.displayName ? user.displayName : "none";
                 createClient({
                     variables: { client: {

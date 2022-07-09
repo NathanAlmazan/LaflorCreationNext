@@ -10,8 +10,11 @@ import {
   ListItem
 } from '@mui/material';
 import { SidebarContext } from '../../SidebarContext';
-import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
-import DesignServicesTwoToneIcon from '@mui/icons-material/DesignServicesTwoTone';
+// icons
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
+import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
+import TimelineIcon from '@mui/icons-material/Timeline';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -174,7 +177,7 @@ function SidebarMenu() {
                 <Button
                   disableRipple
                   onClick={() => handleOptionClicked("/admin/dashboard")}
-                  startIcon={<DesignServicesTwoToneIcon />}
+                  startIcon={<TimelineIcon />}
                 >
                   Dashboard
                 </Button>
@@ -196,7 +199,7 @@ function SidebarMenu() {
                   <Button
                     disableRipple
                     onClick={() => handleOptionClicked("/items/admin")}
-                    startIcon={<SchoolTwoToneIcon />}
+                    startIcon={<LocalFloristIcon />}
                   >
                     Bouquets and Flowers
                   </Button>
@@ -207,9 +210,20 @@ function SidebarMenu() {
                   <Button
                     disableRipple
                     onClick={() => handleOptionClicked("/transactions")}
-                    startIcon={<SchoolTwoToneIcon />}
+                    startIcon={<ReceiptLongIcon />}
                   >
                     Transactions and Orders
+                  </Button>
+                </ListItem>
+            </List>
+            <List component="div">
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    onClick={() => handleOptionClicked("/riders")}
+                    startIcon={<DeliveryDiningIcon />}
+                  >
+                    Riders
                   </Button>
                 </ListItem>
             </List>

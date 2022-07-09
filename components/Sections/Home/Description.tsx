@@ -20,7 +20,7 @@ export default function DescriptionContainer() {
     
     return (
         <AnimatePresence exitBeforeEnter>
-            <Box sx={{ backgroundColor: "#f8f9fa", pt: 15, pb: 15 }}>
+            <Box sx={{ pt: 15, pb: 15 }}>
                 <Container>
                     <Grid 
                         container 

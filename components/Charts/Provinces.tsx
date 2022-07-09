@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
 import merge from 'lodash/merge';
 import ReactApexChart from 'react-apexcharts';
+import { ApexOptions } from 'apexcharts';
 // @mui
 import { styled } from '@mui/material/styles';
 import { Card, CardHeader } from '@mui/material';
@@ -66,7 +66,7 @@ export default function AppCurrentSubject({ title, subheader, chartData, chartCo
       <CardHeader title={title} subheader={subheader} />
 
       <ChartWrapperStyle dir="ltr">
-        <ReactApexChart type="radar" series={chartData} options={chartOptions} height={340} />
+        <ReactApexChart type="radar" series={chartData} options={chartOptions as ApexOptions} height={340} />
       </ChartWrapperStyle>
     </Card>
   );
