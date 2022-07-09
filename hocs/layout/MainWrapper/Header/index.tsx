@@ -98,7 +98,9 @@ function Header() {
         </Box>
       </Stack>
       <Box display="flex" alignItems="center">
-        <HeaderButtons admin={user ? user.admin : false} />
+        {user && (
+          <HeaderButtons admin={user.admin} />
+        )}
         <HeaderUserbox />
       </Box>
     </HeaderWrapper>

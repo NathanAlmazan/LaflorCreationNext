@@ -9,6 +9,7 @@ import Label from '../Label';
 import { Items } from '../../apollo/items';
 // next
 import { useRouter } from "next/router";
+import { useAuth } from '../../hocs/providers/AuthProvider';
 
 // ----------------------------------------------------------------------
 
@@ -24,9 +25,11 @@ const ProductImgStyle = styled('img')({
 
 export default function ShopProductCard({ admin, product, selected, handleSelect }: { admin?: boolean, selected?: boolean, product: Items,  handleSelect?: () => void }) {
   const router = useRouter();
+  const { user } = useAuth();
   const { itemName, itemImage, discount, discountCode, itemPrice, itemCode, isAddon } = product;
   
   const handleOrderNow = () => router.push("/order/" + itemCode);
+  const handleRegister = () => router.push("/register");
 
   return (
     <Card>
@@ -70,7 +73,7 @@ export default function ShopProductCard({ admin, product, selected, handleSelect
               disabled={Boolean(selected)}
               variant="contained"
               startIcon={isAddon ? <AddOutlinedIcon /> : <AddShoppingCartRoundedIcon />}
-              onClick={Boolean(isAddon && handleSelect) ? handleSelect : handleOrderNow}
+              onClick={user ? Boolean(isAddon && handleSelect) ? handleSelect : handleOrderNow : handleRegister}
             >
               {isAddon ? "Add Item" : "Order Now"}
             </Button>
