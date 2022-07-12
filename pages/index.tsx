@@ -42,7 +42,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
   return { 
     props: {
       items: data.allItems
-    }
+    },
+    revalidate: 30
   }
 }
 
