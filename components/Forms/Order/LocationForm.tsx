@@ -15,7 +15,7 @@ type Location = {
     address: string
 }
 
-const mapsKey = "AIzaSyAldUF1vGdjNoM9lkFo8Z6XNzFfxHZonWE";
+const mapsKey = process.env.NEXT_PUBLIC_MAPS_KEY as string;
 
 type LocationFormProps = {
     location: Location,
