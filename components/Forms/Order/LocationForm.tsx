@@ -15,7 +15,7 @@ type Location = {
     address: string
 }
 
-const mapsKey = "AIzaSyA6GLJipum08T4ALZovBiwj3HMse1pZpXo";
+const mapsKey = "AIzaSyAldUF1vGdjNoM9lkFo8Z6XNzFfxHZonWE";
 
 type LocationFormProps = {
     location: Location,

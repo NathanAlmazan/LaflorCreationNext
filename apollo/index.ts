@@ -12,7 +12,7 @@ const defaultOptions: DefaultOptions = {
   }
 
 const client = new ApolloClient({
-    uri: "https://laflorcreation.herokuapp.com/graphql",
+    uri: "http://florcreation.nat911.com/api/v1/graphql",
     cache: new InMemoryCache(),
     defaultOptions: defaultOptions
 });

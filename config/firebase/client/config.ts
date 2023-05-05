@@ -1,13 +1,13 @@
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA6GLJipum08T4ALZovBiwj3HMse1pZpXo",
-  authDomain: "la-flor-creation.firebaseapp.com",
-  projectId: "la-flor-creation",
-  storageBucket: "la-flor-creation.appspot.com",
-  messagingSenderId: "573064101523",
-  appId: "1:573064101523:web:9c56ad7e3da07836e7d766",
-  measurementId: "G-1CG1BGFGNV"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASURE_ID
 };
 
 const app = initializeApp(firebaseConfig);
